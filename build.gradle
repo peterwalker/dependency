@@ -6,6 +6,11 @@ repositories {
 }
 
 dependencies {
+	compile 'org.springframework.data:spring-data-redis:1.0.2.RELEASE'
+	compile 'org.apache.openejb:openejb-core:4.0.0'
+}
 
-    testCompile 'junit:junit:4.11'
+task copyDependencies(type: Copy) {
+	into file("$buildDir/libs")
+	from (configurations.compile)
 }
