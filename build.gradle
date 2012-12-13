@@ -7,10 +7,22 @@ repositories {
 
 dependencies {
 	compile 'org.springframework.data:spring-data-redis:1.0.2.RELEASE'
-	compile 'org.apache.openejb:openejb-core:4.0.0'
+	compile('org.apache.openejb:openejb-core:4.0.0') {
+        exclude group: 'javassist'
+    }
 }
 
 task copyDependencies(type: Copy) {
 	into file("$buildDir/libs")
 	from (configurations.compile)
 }
+
+configurations.all {
+	resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+		if (details.requested.group == 'org.slf4j') {
+			details.forceVersion '1.6.6'
+		}
+	}
+}
+
+clean.dependsOn cleanCopyDependencies
