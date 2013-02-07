@@ -1,15 +1,38 @@
 apply plugin: 'java'
 apply from: 'gradle/wrapper.gradle'
 
+apply plugin: 'duplicates'
+
+buildscript {
+   repositories { maven { url 'http://evgenyg.artifactoryonline.com/evgenyg/repo/' }}
+   dependencies { classpath   'com.github.goldin.plugins.gradle:duplicates:0.2'    }
+}
+
+duplicates   {
+	configurations = [ 'testCompile' ]
+	verbose = true
+}
+
 repositories {
    mavenCentral()
 }
 
 dependencies {
-	compile 'org.springframework.data:spring-data-redis:1.0.2.RELEASE'
-	compile('org.apache.openejb:openejb-core:4.0.0') {
-        exclude group: 'javassist'
-    }
+	compile ('org.springframework.data:spring-data-redis:1.0.2.RELEASE') {
+		exclude group: 'commons-logging', module: 'commons-logging'
+	}
+	compile('org.apache.openejb:openejb-core:4.0.0')
+	{
+		exclude group: 'org.apache.openejb', module: 'javaee-api'
+		exclude group: 'org.slf4j', module: 'slf4j-jdk14'
+		exclude group: 'org.apache.activemq.protobuf', module: 'activemq-protobuf'
+		exclude group: 'javassist'
+		exclude group: 'commons-collections'
+		exclude group: 'org.hamcrest'
+	}
+	testCompile('junit:junit:4.10'){
+		exclude group: 'org.hamcrest'
+	}
 }
 
 task copyDependencies(type: Copy) {
@@ -19,8 +42,9 @@ task copyDependencies(type: Copy) {
 
 configurations.all {
 	resolutionStrategy.eachDependency { DependencyResolveDetails details ->
-		if (details.requested.group == 'org.slf4j') {
-			details.forceVersion '1.6.6'
+		if (details.requested.name == 'geronimo-jms_1.1_spec') {
+			//prefer 'javax.jms:jms-api' over 'org.apache.geronimo.specs:geronimo-jms_1.1_spec':
+			details.useTarget 'javax.jms:jms-api:1.1-rev-1'
 		}
 	}
 }
