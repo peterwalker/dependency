@@ -29,6 +29,7 @@ dependencies {
 		exclude group: 'javassist'
 		exclude group: 'commons-collections'
 		exclude group: 'org.hamcrest'
+		exclude group: 'junit'
 	}
 	testCompile('junit:junit:4.10'){
 		exclude group: 'org.hamcrest'
